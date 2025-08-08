@@ -90,14 +90,17 @@ app.post("/callback", (req, res) => {
   req.on("end", async () => {
     try {
       const data = JSON.parse(body || "{}");
-      console.log("ONLYOFFICE CALLBACK:", JSON.stringify(data));
+      console.log("ONLYOFFICE CALLBACK:", data); // veja o status aqui
 
-      // responda 200 SEMPRE e rápido
-      res.status(200).json({ ok: true });
+      // 1) RESPONDA JÁ no formato que o OnlyOffice espera
+      //    error: 0 = ok
+      res.status(200).json({ error: 0 });
 
-      // salva em background quando estiver pronto
+      // 2) Salve em background quando estiver pronto (status === 2)
       if (data.status === 2 && data.url) {
+        // se seu Node < 18, instale node-fetch e use "const fetch = (...)=>(import('node-fetch').then(({default:f})=>f(...)))"
         const r = await fetch(data.url);
+        if (!r.ok) throw new Error("Falha ao baixar salvo: " + r.status);
         const buf = Buffer.from(await r.arrayBuffer());
         const name = data.filename || `saved-${Date.now()}.docx`;
         fs.writeFileSync(path.join(uploadDir, name), buf);
@@ -105,7 +108,7 @@ app.post("/callback", (req, res) => {
       }
     } catch (e) {
       console.error("Erro no callback:", e);
-      // 200 já foi enviado — não quebre
+      // já respondemos 200; não quebre
     }
   });
 });
