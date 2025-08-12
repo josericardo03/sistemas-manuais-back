@@ -7,4 +7,11 @@ export const config = {
   jwt: {
     secret: process.env.JWT_SECRET || "secret",
   },
+  database: {
+    host: process.env.DB_HOST || "192.168.10.17",
+    port: parseInt(process.env.DB_PORT || "5432"),
+    database: process.env.DB_NAME || "manuais",
+    user: process.env.DB_USER || "postgres",
+    password: process.env.DB_PASSWORD || "12345678",
+  },
 };
