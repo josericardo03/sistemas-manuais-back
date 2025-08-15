@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import authRoutes from "./routes/auth";
 
 // Importação do multer usando require para evitar problemas de tipagem
@@ -73,11 +74,22 @@ app.get("/edit", (req, res) => {
   const fileUrl: string = `http://host.docker.internal:${PORT}${req.query.fileUrl}`;
   const callbackUrl: string = `http://host.docker.internal:${PORT}/callback`;
 
+  // Identificação do usuário para coedição (pode vir via query ou sua autenticação)
+  const userId: string = String(req.query.userId || req.ip || "guest");
+  const userName: string = String(req.query.userName || "Convidado");
+
+  // Chave estável por documento para permitir coedição
+  const documentKey: string = crypto
+    .createHash("sha256")
+    .update(fileUrl)
+    .digest("hex")
+    .slice(0, 32);
+
   // 1) MONTE O PAYLOAD
   const payload: any = {
     document: {
       fileType: "docx",
-      key: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      key: documentKey,
       title,
       url: fileUrl,
     },
@@ -85,6 +97,14 @@ app.get("/edit", (req, res) => {
     editorConfig: {
       lang: "pt-BR",
       callbackUrl,
+      user: {
+        id: userId,
+        name: userName,
+      },
+      coEditing: {
+        mode: "fast",
+        change: true,
+      },
     },
     exp: Math.floor(Date.now() / 1000) + 300,
   };
