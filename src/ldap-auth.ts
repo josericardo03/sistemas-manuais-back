@@ -20,7 +20,7 @@ export class LDAPAuthService {
 
   constructor(config: LDAPConfig) {
     this.config = config;
-    this.jwtSecret = process.env.JWT_SECRET || "sua-chave-secreta";
+    this.jwtSecret = process.env.JWT_SECRET || "supersegredo123";
   }
 
   async authenticateUser(

@@ -4,6 +4,7 @@ import fs from "fs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import authRoutes from "./routes/auth";
+import approvalRoutes from "./routes/approval";
 import os from "os";
 
 // Importação do multer usando require para evitar problemas de tipagem
@@ -41,6 +42,9 @@ app.use("/uploads", express.static(uploadDir));
 
 // Rotas de autenticação
 app.use("/api/auth", authRoutes);
+
+// Rotas de aprovação
+app.use("/api/approval", approvalRoutes);
 
 // Rota principal com formulário de upload e botão de teste
 app.get("/", (req, res) => {

@@ -5,7 +5,7 @@ export const config = {
     domain: process.env.LDAP_DOMAIN || "desenvolvemt.local",
   },
   jwt: {
-    secret: process.env.JWT_SECRET || "secret",
+    secret: process.env.JWT_SECRET || "supersegredo123",
   },
   database: {
     host: process.env.DB_HOST || "192.168.10.17",
