@@ -7,6 +7,7 @@ export interface ManualApproval {
   manual_id: string;
   version_seq: number;
   approver_username: string;
+  decision_seq: number;
   decision: "approved" | "rejected" | "pending";
   comment?: string;
   decided_at?: Date;

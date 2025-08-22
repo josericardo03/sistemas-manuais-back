@@ -285,7 +285,44 @@ router.delete(
 
       res.json({
         success: true,
-        message: "Aprovação removida com sucesso",
+        message: "Todas as decisões do usuário removidas com sucesso",
+      });
+    } catch (error) {
+      console.error("Erro ao remover aprovação:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro interno do servidor",
+      });
+    }
+  }
+);
+
+// 🗑️ REMOVER DECISÃO ESPECÍFICA (apenas admin)
+router.delete(
+  "/approval/:manualId/:versionSeq/:username/decision/:decisionSeq",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    try {
+      const { manualId, versionSeq, username, decisionSeq } = req.params;
+
+      // Verificar se é admin
+      if ((req as any).user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "Apenas administradores podem remover aprovações",
+        });
+      }
+
+      await approvalService.removeApproval(
+        manualId,
+        parseInt(versionSeq),
+        username,
+        parseInt(decisionSeq)
+      );
+
+      res.json({
+        success: true,
+        message: "Decisão específica removida com sucesso",
       });
     } catch (error) {
       console.error("Erro ao remover aprovação:", error);

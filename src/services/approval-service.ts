@@ -103,27 +103,38 @@ export class ApprovalService {
   // ✅ APROVAR/REJEITAR MANUAL
   async approveManual(decision: ApprovalDecision): Promise<void> {
     try {
+      // Primeiro, vamos obter a próxima sequência de decisão para este usuário/manual
+      const nextSeqQuery = `
+        SELECT COALESCE(MAX(decision_seq), 0) + 1 as next_seq
+        FROM manual_approvals 
+        WHERE manual_id = $1 AND version_seq = $2 AND approver_username = $3
+      `;
+
+      const seqResult = await this.pool.query(nextSeqQuery, [
+        decision.manual_id,
+        decision.version_seq,
+        decision.approver_username,
+      ]);
+
+      const nextSeq = seqResult.rows[0].next_seq;
+
       const query = `
         INSERT INTO manual_approvals 
-        (manual_id, version_seq, approver_username, decision, comment, decided_at)
-        VALUES ($1, $2, $3, $4, $5, NOW())
-        ON CONFLICT (manual_id, version_seq, approver_username) 
-        DO UPDATE SET 
-          decision = EXCLUDED.decision,
-          comment = EXCLUDED.comment,
-          decided_at = NOW()
+        (manual_id, version_seq, approver_username, decision_seq, decision, comment, decided_at)
+        VALUES ($1, $2, $3, $4, $5, $6, NOW())
       `;
 
       await this.pool.query(query, [
         decision.manual_id,
         decision.version_seq,
         decision.approver_username,
+        nextSeq,
         decision.decision,
         decision.comment,
       ]);
 
       console.log(
-        `✅ Decisão registrada: ${decision.decision} para manual ${decision.manual_id}`
+        `✅ Nova decisão registrada: ${decision.decision} para manual ${decision.manual_id} (seq: ${nextSeq})`
       );
     } catch (error) {
       console.error("Erro ao registrar decisão:", error);
@@ -189,11 +200,11 @@ export class ApprovalService {
     try {
       const query = `
         SELECT 
-          manual_id, version_seq, approver_username, 
+          manual_id, version_seq, approver_username, decision_seq,
           decision, comment, decided_at
         FROM manual_approvals 
         WHERE manual_id = $1 AND version_seq = $2
-        ORDER BY decided_at ASC
+        ORDER BY approver_username ASC, decision_seq ASC
       `;
 
       const result = await this.pool.query(query, [manualId, versionSeq]);
@@ -208,15 +219,30 @@ export class ApprovalService {
   async removeApproval(
     manualId: string,
     versionSeq: number,
-    approverUsername: string
+    approverUsername: string,
+    decisionSeq?: number
   ): Promise<void> {
     try {
-      const query = `
-        DELETE FROM manual_approvals 
-        WHERE manual_id = $1 AND version_seq = $2 AND approver_username = $3
-      `;
+      let query: string;
+      let params: any[];
 
-      await this.pool.query(query, [manualId, versionSeq, approverUsername]);
+      if (decisionSeq !== undefined) {
+        // Remover decisão específica
+        query = `
+          DELETE FROM manual_approvals 
+          WHERE manual_id = $1 AND version_seq = $2 AND approver_username = $3 AND decision_seq = $4
+        `;
+        params = [manualId, versionSeq, approverUsername, decisionSeq];
+      } else {
+        // Remover todas as decisões do usuário para este manual
+        query = `
+          DELETE FROM manual_approvals 
+          WHERE manual_id = $1 AND version_seq = $2 AND approver_username = $3
+        `;
+        params = [manualId, versionSeq, approverUsername];
+      }
+
+      await this.pool.query(query, params);
       console.log(`🗑️ Aprovação removida para ${approverUsername}`);
     } catch (error) {
       console.error("Erro ao remover aprovação:", error);

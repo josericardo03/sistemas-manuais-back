@@ -11,6 +11,33 @@ Este sistema permite gerenciar o fluxo de aprovação de manuais através de um 
 1. **`manual_approval_rules`** - Define quantas aprovações cada manual precisa
 2. **`manual_approvals`** - Registra todas as decisões de aprovação/rejeição
 
+### 🔧 Nova Estrutura com `decision_seq`
+
+Para permitir **múltiplas decisões** do mesmo usuário, foi adicionado o campo `decision_seq`:
+
+```sql
+-- Estrutura atualizada da tabela manual_approvals
+CREATE TABLE manual_approvals (
+  manual_id UUID,
+  version_seq INTEGER,
+  approver_username TEXT,
+  decision_seq INTEGER,        -- ← NOVO: Sequência da decisão
+  decision TEXT,
+  comment TEXT,
+  decided_at TIMESTAMP,
+  PRIMARY KEY (manual_id, version_seq, approver_username, decision_seq)
+);
+```
+
+**Chave Primária Composta**: `(manual_id, version_seq, approver_username, decision_seq)`
+
+**Benefícios**:
+
+- ✅ **Múltiplas Decisões**: Mesmo usuário pode dar diferentes opiniões
+- ✅ **Histórico Completo**: Todas as mudanças ficam registradas
+- ✅ **Auditoria**: Rastreamento completo de evolução das decisões
+- ✅ **Flexibilidade**: Usuário pode corrigir ou mudar sua opinião
+
 ### Funcionalidades Implementadas
 
 - ✅ **Regras de Aprovação**: Configurar número de aprovações necessárias por manual
@@ -77,7 +104,8 @@ Authorization: Bearer SEU_TOKEN_JWT
 
 - `POST /api/approval/decision` - Registrar decisão (aprovar/rejeitar)
 - `POST /api/approval/rules` - Criar/atualizar regras
-- `DELETE /api/approval/approval/:manualId/:versionSeq/:username` - Remover aprovação (admin)
+- `DELETE /api/approval/approval/:manualId/:versionSeq/:username` - Remover todas as decisões do usuário (admin)
+- `DELETE /api/approval/approval/:manualId/:versionSeq/:username/decision/:decisionSeq` - Remover decisão específica (admin)
 
 ## 🔐 Autenticação
 
@@ -105,6 +133,48 @@ Para obter o token, faça login via `/api/auth/login`
 
 - Qualquer rejeição automaticamente rejeita o manual
 - Requer nova submissão após correções
+
+## 🔄 Comportamento das Decisões
+
+### ⚠️ **IMPORTANTE**: Cada Decisão Gera um Novo Registro
+
+- **✅ Sempre**: Cada `POST /api/approval/decision` cria um **NOVO** registro
+- **🔄 Histórico Completo**: Todas as decisões ficam registradas para auditoria
+- **📊 Rastreabilidade**: Você pode ver toda a evolução das decisões
+- **👥 Múltiplas Opiniões**: Mesmo usuário pode dar diferentes opiniões ao longo do tempo
+
+### 📝 Exemplo de Uso
+
+```bash
+# 1. Primeira decisão: Aprova
+POST /api/approval/decision
+{
+  "manual_id": "manual-001",
+  "version_seq": 1,
+  "decision": "approved",
+  "comment": "Aprovado inicialmente"
+}
+
+# 2. Segunda decisão: Muda para rejected
+POST /api/approval/decision
+{
+  "manual_id": "manual-001",
+  "version_seq": 1,
+  "decision": "rejected",
+  "comment": "Revisado e rejeitado"
+}
+
+# 3. Terceira decisão: Volta para approved
+POST /api/approval/decision
+{
+  "manual_id": "manual-001",
+  "version_seq": 1,
+  "decision": "approved",
+  "comment": "Corrigido e aprovado novamente"
+}
+```
+
+**Resultado**: ✅ **3 registros separados** no banco de dados
 
 ## 🎯 Exemplos Práticos
 
@@ -137,6 +207,7 @@ POST /api/approval/decision
 }
 
 # Status: APPROVED ✅
+# Banco: 2 registros separados para auditoria
 ```
 
 ### Cenário 2: Manual Rejeitado
