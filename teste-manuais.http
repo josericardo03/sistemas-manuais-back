@@ -1,0 +1,63 @@
+### 📚 Teste das Rotas de Manuais
+
+# 1. Primeiro, faça login para obter o token
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "josesilva",
+  "password": "sua_senha_aqui"
+}
+
+###
+
+# 2. Listar todos os manuais
+GET http://localhost:3000/api/manuals
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 3. Listar manuais com status de aprovação
+GET http://localhost:3000/api/manuals/with-approval-status
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 4. Buscar manual específico por ID
+GET http://localhost:3000/api/manuals/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 5. Abrir manual no OnlyOffice (versão mais recente)
+GET http://localhost:3000/api/manuals/123e4567-e89b-12d3-a456-426614174000/open
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 6. Abrir manual no OnlyOffice (versão específica)
+GET http://localhost:3000/api/manuals/123e4567-e89b-12d3-a456-426614174000/open?version=1
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 7. Download do arquivo do manual
+GET http://localhost:3000/api/manuals/123e4567-e89b-12d3-a456-426614174000/download/1
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 8. Teste sem token (deve retornar 401)
+GET http://localhost:3000/api/manuals
+
+###
+
+# 9. Teste com manual inexistente (deve retornar 404)
+GET http://localhost:3000/api/manuals/manual-inexistente
+Authorization: Bearer {{auth_token}}
+
+###
+
+# 10. Verificar status de aprovação do manual
+GET http://localhost:3000/api/approval/status/123e4567-e89b-12d3-a456-426614174000/1
+Authorization: Bearer {{auth_token}}

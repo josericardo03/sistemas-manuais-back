@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import authRoutes from "./routes/auth";
 import approvalRoutes from "./routes/approval";
+import manualRoutes from "./routes/manuals"; // Adicionado para rotas de manuais
 import os from "os";
 
 // Importação do multer usando require para evitar problemas de tipagem
@@ -45,6 +46,9 @@ app.use("/api/auth", authRoutes);
 
 // Rotas de aprovação
 app.use("/api/approval", approvalRoutes);
+
+// Rotas de manuais
+app.use("/api/manuals", manualRoutes);
 
 // Rota principal com formulário de upload e botão de teste
 app.get("/", (req, res) => {
@@ -266,6 +270,19 @@ app.get("/", (req, res) => {
                     <a href="/api/auth/groups" target="_blank" class="btn btn-primary" style="margin: 5px;">🏷️ Listar Grupos</a>
                     <a href="/test" target="_blank" class="btn btn-primary" style="margin: 5px;">🧪 Status da API</a>
                 </div>
+            </div>
+
+            <div class="section">
+                <h2>📚 Gerenciar Manuais</h2>
+                <p>Visualize e edite seus manuais diretamente no OnlyOffice:</p>
+                <div class="auth-links">
+                    <a href="/api/manuals" target="_blank" class="btn btn-primary" style="margin: 5px;">📋 Listar Manuais</a>
+                    <a href="/api/manuals/with-approval-status" target="_blank" class="btn btn-primary" style="margin: 5px;">📊 Manuais com Status</a>
+                    <a href="/api/approval/requests" target="_blank" class="btn btn-primary" style="margin: 5px;">⏳ Solicitações de Aprovação</a>
+                </div>
+                <p style="text-align: center; margin-top: 15px; opacity: 0.8;">
+                    Use o token de autenticação para acessar as rotas protegidas
+                </p>
             </div>
 
             <div class="features">
