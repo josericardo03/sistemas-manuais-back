@@ -1,0 +1,65 @@
+### 🔔 Teste do Sistema de Notificações
+
+### 1. Listar todas as notificações do usuário
+GET http://localhost:3000/api/notifications
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 2. Buscar notificações não lidas
+GET http://localhost:3000/api/notifications/unread
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 3. Contar notificações não lidas
+GET http://localhost:3000/api/notifications/count
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 4. Marcar notificação como lida
+PATCH http://localhost:3000/api/notifications/1/read
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 5. Marcar todas como lidas
+PATCH http://localhost:3000/api/notifications/read-all
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 6. Deletar notificação
+DELETE http://localhost:3000/api/notifications/1
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 7. Criar notificação de teste
+POST http://localhost:3000/api/notifications
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+  "user_username": "usuario.teste",
+  "title": "Notificação de Teste",
+  "message": "Esta é uma notificação de teste para verificar o sistema",
+  "type": "system"
+}
+
+### 8. Criar notificação de solicitação de aprovação
+POST http://localhost:3000/api/notifications
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+  "user_username": "aprovador.teste",
+  "title": "Manual para Aprovar",
+  "message": "Manual 'Procedimentos de Segurança' aguarda sua aprovação",
+  "type": "approval_request",
+  "related_manual_id": "123e4567-e89b-12d3-a456-426614174000",
+  "related_version_seq": 1
+}
+
+### 9. Criar notificação de decisão de aprovação
+POST http://localhost:3000/api/notifications
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+  "user_username": "dono.manual",
+  "title": "Manual Aprovado",
+  "message": "Seu manual foi aprovado por João Silva",
+  "type": "approval_decision",
+  "related_manual_id": "123e4567-e89b-12d3-a456-426614174000",
+  "related_version_seq": 1
+}

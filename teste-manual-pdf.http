@@ -1,0 +1,63 @@
+### 📄 Teste da Rota PDF para Manuais
+
+### 1. Abrir manual como PDF (conversão automática DOCX → PDF)
+GET http://localhost:3000/api/manuals/MANUAL_ID_AQUI/open-pdf
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 2. Abrir manual como PDF com versão específica
+GET http://localhost:3000/api/manuals/MANUAL_ID_AQUI/open-pdf?version=1
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 3. Comparar com a rota DOCX original
+GET http://localhost:3000/api/manuals/MANUAL_ID_AQUI/open
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 4. Listar manuais disponíveis para teste
+GET http://localhost:3000/api/manuals
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 5. Buscar manual específico por ID
+GET http://localhost:3000/api/manuals/MANUAL_ID_AQUI
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 6. Download do manual em formato original (DOCX)
+GET http://localhost:3000/api/manuals/MANUAL_ID_AQUI/download/1
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 7. Download do manual convertido para PDF
+GET http://localhost:3000/api/manuals/MANUAL_ID_AQUI/download/1?format=pdf
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### 📋 Como usar:
+
+# 1. Primeiro, faça login para obter o token:
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "seu_usuario",
+  "password": "sua_senha"
+}
+
+# 2. Use o token retornado no header Authorization:
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# 3. Substitua MANUAL_ID_AQUI pelo ID real do manual:
+# Exemplo: /api/manuals/123e4567-e89b-12d3-a456-426614174000/open-pdf
+
+### 🎯 Diferenças entre as rotas:
+
+# Rota DOCX (/open):
+# - Modo: Edição completa
+# - Formato: DOCX original
+# - Uso: Criar/editar conteúdo
+
+# Rota PDF (/open-pdf):
+# - Modo: Visualização + comentários
+# - Formato: PDF convertido automaticamente
+# - Uso: Aprovação, revisão, comentários
+# - Download: Botão para baixar PDF real
+
+# Download:
+# - /download/1 → Arquivo DOCX original
+# - /download/1?format=pdf → Arquivo PDF convertido

@@ -6,6 +6,7 @@ import crypto from "crypto";
 import authRoutes from "./routes/auth";
 import approvalRoutes from "./routes/approval";
 import manualRoutes from "./routes/manuals"; // Adicionado para rotas de manuais
+import notificationRoutes from "./routes/notifications"; // Adicionado para rotas de notificações
 import os from "os";
 
 // Importação do multer usando require para evitar problemas de tipagem
@@ -49,6 +50,9 @@ app.use("/api/approval", approvalRoutes);
 
 // Rotas de manuais
 app.use("/api/manuals", manualRoutes);
+
+// Rotas de notificações
+app.use("/api/notifications", notificationRoutes);
 
 // Rota principal com formulário de upload e botão de teste
 app.get("/", (req, res) => {
@@ -272,18 +276,34 @@ app.get("/", (req, res) => {
                 </div>
             </div>
 
-            <div class="section">
-                <h2>📚 Gerenciar Manuais</h2>
-                <p>Visualize e edite seus manuais diretamente no OnlyOffice:</p>
-                <div class="auth-links">
-                    <a href="/api/manuals" target="_blank" class="btn btn-primary" style="margin: 5px;">📋 Listar Manuais</a>
-                    <a href="/api/manuals/with-approval-status" target="_blank" class="btn btn-primary" style="margin: 5px;">📊 Manuais com Status</a>
-                    <a href="/api/approval/requests" target="_blank" class="btn btn-primary" style="margin: 5px;">⏳ Solicitações de Aprovação</a>
-                </div>
-                <p style="text-align: center; margin-top: 15px; opacity: 0.8;">
-                    Use o token de autenticação para acessar as rotas protegidas
-                </p>
-            </div>
+                               <div class="section">
+                       <h2>📚 Gerenciar Manuais</h2>
+                       <p>Visualize e edite seus manuais diretamente no OnlyOffice:</p>
+                       <div class="auth-links">
+                           <a href="/api/manuals" target="_blank" class="btn btn-primary" style="margin: 5px;">📋 Listar Manuais</a>
+                           <a href="/api/manuals/with-approval-status" target="_blank" class="btn btn-primary" style="margin: 5px;">📊 Manuais com Status</a>
+                           <a href="/api/approval/requests" target="_blank" class="btn btn-primary" style="margin: 5px;">⏳ Solicitações de Aprovação</a>
+                       </div>
+                       <p style="text-align: center; margin-top: 15px; opacity: 0.8;">
+                           Use o token de autenticação para acessar as rotas protegidas
+                       </p>
+                       <p style="text-align: center; margin-top: 15px; opacity: 0.8;">
+                           <strong>💡 Dica:</strong> Use a rota PDF para visualização e comentários, DOCX para edição
+                       </p>
+                   </div>
+
+                   <div class="section">
+                       <h2>🔔 Sistema de Notificações</h2>
+                       <p>Gerencie suas notificações e acompanhe atualizações:</p>
+                       <div class="auth-links">
+                           <a href="/api/notifications" target="_blank" class="btn btn-primary" style="margin: 5px;">📋 Minhas Notificações</a>
+                           <a href="/api/notifications/unread" target="_blank" class="btn btn-primary" style="margin: 5px;">🔍 Não Lidas</a>
+                           <a href="/api/notifications/count" target="_blank" class="btn btn-primary" style="margin: 5px;">📊 Contador</a>
+                       </div>
+                       <p style="text-align: center; margin-top: 15px; opacity: 0.8;">
+                           Receba notificações automáticas sobre aprovações e atualizações
+                       </p>
+                   </div>
 
             <div class="features">
                 <div class="feature">
